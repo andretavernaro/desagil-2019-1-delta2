@@ -25,9 +25,11 @@ public class GateView extends FixedPanel implements ItemListener, MouseListener 
     private final JCheckBox[] inputBoxes;
     private final Image image;
     private Color color;
+    // --Commented out by Inspection (19/06/2019 09:31):private Color color2;
+
 
     public GateView(Gate gate) {
-        super(BORDER + SWITCH_SIZE + GATE_WIDTH + LIGHT_SIZE + BORDER, GATE_HEIGHT);
+        super(GATE_HEIGHT);
 
         this.gate = gate;
 
@@ -89,34 +91,68 @@ public class GateView extends FixedPanel implements ItemListener, MouseListener 
 
         g.drawImage(image, BORDER + SWITCH_SIZE, 0, GATE_WIDTH, GATE_HEIGHT, this);
 
-        if (gate.read()) {
-            g.setColor(color);
-        } else {
-            g.setColor(Color.BLACK);
-        }
-        g.fillOval(BORDER + SWITCH_SIZE + GATE_WIDTH, (GATE_HEIGHT - LIGHT_SIZE) / 2, LIGHT_SIZE, LIGHT_SIZE);
+        int outputSize = gate.getOutputSize();
 
-        getToolkit().sync();
+        // Espaçamento
+        int y, step;
+        y = -(SWITCH_SIZE / 2);
+        step = (GATE_HEIGHT / (outputSize + 1));
+
+        for (int i = 0; i < outputSize; i++) {
+            y += step;
+            boolean result = gate.read(i);
+
+            if (result) {
+                g.setColor(color);
+            } else {
+                g.setColor(Color.BLACK);
+            }
+            g.fillOval(BORDER + SWITCH_SIZE + GATE_WIDTH, y, LIGHT_SIZE, LIGHT_SIZE);
+        }
     }
+
+
 
     @Override
     public void mouseClicked(MouseEvent e) {
         int x = BORDER + SWITCH_SIZE + GATE_WIDTH + LIGHT_SIZE / 2;
-        int y = GATE_HEIGHT / 2;
 
-        if (Math.sqrt(Math.pow(x - e.getX(), 2) + Math.pow(y - e.getY(), 2)) < LIGHT_SIZE / 2) {
-            Color color = JColorChooser.showDialog(this, null, this.color);
+        int outputSize = gate.getOutputSize();
 
-            if (color != null) {
-                this.color = color;
+        // Espaçamento
+        int y, step;
+        y = -(SWITCH_SIZE / 2);
+        step = (GATE_HEIGHT / (outputSize + 1));
+
+        for (int i = 0; i < outputSize; i++) {
+            y += step;
+            boolean result = gate.read(i);
+
+            if (Math.sqrt(Math.pow(x - e.getX(), 2) + Math.pow(y - e.getY(), 2)) < LIGHT_SIZE / 2) {
+                Color color = JColorChooser.showDialog(this, null, this.color);
+
+                if (color != null) {
+                    this.color = color;
+                }
+
+                repaint();
             }
-
-            repaint();
         }
     }
 
-    @Override public void mousePressed(MouseEvent e) {}
-    @Override public void mouseReleased(MouseEvent e) {}
-    @Override public void mouseEntered(MouseEvent e) {}
-    @Override public void mouseExited(MouseEvent e) {}
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
 }
